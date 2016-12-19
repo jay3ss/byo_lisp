@@ -1,5 +1,6 @@
 // Parsing library
 #include "mpc.h"
+#include "lval.h"
 
-long eval(mpc_ast_t* t);
-long eval_op(long x, char* op, long y);
+lval eval(mpc_ast_t* t);
+lval eval_op(long x, char* op, long y);

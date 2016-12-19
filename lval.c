@@ -1,4 +1,49 @@
-#include "evaluation.h"
+#include "lval.h"
+
+// Create a new number type lval
+lval lval_num(long x) {
+    lval v;
+    v.type = LVAL_NUM;
+    v.num = x;
+    return v;
+}
+
+// Create a new error type lval
+lval lval_err(int x) {
+    lval v;
+    v.type = LVAL_ERR;
+    v.err = x;
+    return v;
+}
+
+// Print an "lval"
+void lval_print(lval v) {
+    switch (v.type) {
+        // In the case the type is a number print it
+        // Then 'break' out of the switch
+        case LVAL_NUM:
+            printf("%li", v.num);
+            break;
+
+        // In the case the type is an error
+        case LVAL_ERR:
+            if (v.err == LERR_DIV_ZERO) {
+                printf("Error: Division By Zero!");
+            }
+            if (v.err == LERR_BAD_OP) {
+                printf("Error: Invalid Operator!");
+            }
+            if (v.err == LERR_BAD_NUM) {
+                printf("Error: Invalid Number!");
+            }
+        break;
+    }
+}
+
+void lval_println(lval v) {
+    lval_print(v);
+    putchar('\n');
+}
 
 lval eval(mpc_ast_t* t) {
     // If tagged as a number return it directly
@@ -6,7 +51,7 @@ lval eval(mpc_ast_t* t) {
         // Check if there is some error in conversion
         errno = 0;
         long x = strtol(t->contents, NULL, 10);
-        return errno != ERANGE ? lval_num(x) : lval_error(LERR_BAD_NUM);
+        return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
     }
 
     // The operator is always second child.

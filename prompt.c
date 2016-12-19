@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Parsing library
-#include "mpc.h"
-
-// Evaluation functions
-#include "evaluation.h"
+// lval functions
+#include "lval.h"
 
 /*if we are compiling on Windows compile these functions */
 #ifdef _WIN32
@@ -55,8 +52,8 @@ int main(int argc, char** argv) {
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
             // On success Print the AST
-            long result = eval(r.output);
-            printf("%li\n", result);
+            lval result = eval(r.output);
+            lval_println(result);
             mpc_ast_delete(r.output);
         } else {
             // Otherwise Print the Error
