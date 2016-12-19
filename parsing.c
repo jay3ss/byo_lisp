@@ -4,23 +4,12 @@
 // Parsing library
 #include "mpc.h"
 
+// Evaluation functions
+#include "evaluation.h"
+
 /*if we are compiling on Windows compile these functions */
 #ifdef _WIN32
-#include <string.h>
-
-static char buffer[2048];
-
-/* Fake readline function */
-char* readline(char* prompt) {
-    fputs(prompt, stdout);
-    fgets(buffer, 2048, stdin);
-    char* cpy = malloc(strlen(buffer)+1);
-    cpy[strlen(cpy)-1] = '\0';
-    return cpy;
-}
-
-/* Fake add_history function */
-void add_history(char* unused) {}
+#include "readline_fake.h"
 
 /* Otherwise include the editline headers */
 #else
@@ -29,11 +18,6 @@ void add_history(char* unused) {}
 #endif
 
 int main(int argc, char** argv) {
-// Parsing library
-#include "mpc.h"
-
-// Parsing library
-#include "mpc.h"
 
     // Create Some Parsers
     mpc_parser_t* Number   = mpc_new("number");
@@ -52,7 +36,7 @@ int main(int argc, char** argv) {
         Number, Operator, Expr, Lispy);
 
     /* Print Version and Exit Information */
-    puts("Lispy Version 0.0.0.0.2");
+    puts("Lispy Version 0.0.0.0.3");
     puts("Press Ctrl+c to Exit\n");
 
     /* In a never ending loop */
@@ -71,25 +55,14 @@ int main(int argc, char** argv) {
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
             // On success Print the AST
-            mpc_ast_print(r.output);
+            long result = eval(r.output);
+            printf("%li\n", result);
             mpc_ast_delete(r.output);
         } else {
             // Otherwise Print the Error
             mpc_err_print(r.error);
             mpc_err_delete(r.error);
         }
-
-        // Load AST from output
-        // mpc_ast_t* a = r.output;
-        // printf("Tag: %s\n", a->tag);
-        // printf("Contents: %s\n", a->contents);
-        // printf("Number of children: %i\n", a->children_num);
-        //
-        // // Get First Child
-        // mpc_ast_t* c0 = a->children[0];
-        // printf("First Child Tag: %s\n", c0->tag);
-        // printf("Frist Child Contents: %s\n", c0->contents);
-        // printf("First Child Number of Children %i\n", c0->children_num);
 
         /* Free retrieved input */
         free(input);
